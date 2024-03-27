@@ -69,7 +69,7 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
         observeWeatherState()
     }
 
-    private fun observeEditorActionListener() {
+    private fun observeEditorActionListener() { // Search
         binding.cityEditText.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 try {
@@ -117,7 +117,7 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
         }
     }
 
-    private fun ImageView.setFavorites(isFavorites: Boolean) {
+    private fun ImageView.setFavorites(isFavorites: Boolean) { // set Favorites Images
         val icon = when (isFavorites) {
             true -> R.drawable.ic_baseline_favorite_24
             false -> R.drawable.ic_baseline_favorite_border_24
@@ -139,7 +139,7 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
         }
     }
 
-    private fun TextView.setQuality(qualityResId: Int, colorResId: Int) {
+    private fun TextView.setQuality(qualityResId: Int, colorResId: Int) { // Set quality via qualityid, set text color
         this.text = getString(qualityResId)
         this.setTextColor(
             ContextCompat.getColor(requireContext(), colorResId)

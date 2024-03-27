@@ -1,5 +1,8 @@
 package com.example.weatherforecast.ui.settings
 
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -11,7 +14,9 @@ import com.example.weatherforecast.utils.collectFlow
 import com.example.weatherforecast.databinding.FragmentSettingsBinding
 import com.example.weatherforecast.model.SupportedLanguage
 import com.example.weatherforecast.model.Units
+import com.example.weatherforecast.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment(R.layout.fragment_settings) {
@@ -39,6 +44,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 val language = SupportedLanguage.getLanguageValue(pos)
                 if (viewModel.state.value.selectedLanguage != language) {
                     viewModel.setLanguage(language)
+//                    if(language != "vi") {
+                        changeLanguage(requireContext(), language)
+//                    }
+//                    else if(language == "zh") {
+//                        changeLanguage(requireContext(), language)
+//                    }
                 }
             }
 
@@ -65,5 +76,32 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             unitsSpinner.setSelection(Units.getIndex(state.selectedUnits))
             versionTextView.text = state.versionInfo
         }
+    }
+    private fun changeLanguage(context: Context, languageCode: String) {
+        var locale = Locale(languageCode);
+        if(languageCode != "en"){
+            locale = Locale(languageCode)
+            Locale.setDefault(locale)
+        }
+        else{
+            locale = Locale.getDefault()
+            Locale.setDefault(locale)
+        }
+
+        // Get the resources object from the application context
+        val resources = context.resources
+
+        // Create a new configuration and set the locale
+        val configuration = Configuration(resources.configuration)
+        configuration.setLocale(locale)
+
+        // Update the configuration
+        @Suppress("DEPRECATION")
+        resources.updateConfiguration(configuration, resources.displayMetrics)
+
+        // Restart the activity to apply the language change
+        val intent = Intent(context, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
     }
 }
