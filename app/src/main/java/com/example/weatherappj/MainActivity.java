@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -16,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -37,8 +40,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
     private WeatherRVAdapter weatherRVAdapter;
     private LocationManager locationManager;
     private int PERMISSION_CODE = 1;
-
+    private ImageView favoriteIV;
+    private Set<String> favorites;
+    private SharedPreferences prefs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,10 +91,13 @@ public class MainActivity extends AppCompatActivity {
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (location != null){cityName = getCityName(location.getLongitude(),location.getLatitude());
             getWeatherInfo(cityName);
+//            updateFavoriteIcon(cityName, favoriteIV);
         } else {
               cityName = "Ranchi";
              getWeatherInfo(cityName);
-           // Toast.makeText(this, "Invalid User's Location", Toast.LENGTH_SHORT).show();
+//            updateFavoriteIcon(cityName, favoriteIV);
+
+            // Toast.makeText(this, "Invalid User's Location", Toast.LENGTH_SHORT).show();
 
         }
 
@@ -100,7 +110,39 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     cityNameTV.setText(cityName);
                     getWeatherInfo(city);
+//                    updateFavoriteIcon(cityName, favoriteIV);
+
                 }
+            }
+        });
+        Button btnFavWeather = findViewById(R.id.btnFavWeather);
+        btnFavWeather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, FavoriteWeatherActivity.class);
+                startActivity(intent);
+            }
+        });
+//        favoriteIV = findViewById(R.id.iv_favorite);
+        prefs = getSharedPreferences("FAVORITES", MODE_PRIVATE);
+        favorites = prefs.getStringSet("FavoriteLocations", new HashSet<>());
+        cityName = getCityName(location.getLongitude(), location.getLatitude());
+//        updateFavoriteIcon(cityName, favoriteIV);
+        final ImageView favoriteIV = findViewById(R.id.iv_favorite);
+        favoriteIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Refresh the favorites set from SharedPreferences
+                favorites = new HashSet<>(prefs.getStringSet("FavoriteLocations", new HashSet<>()));
+
+                if (favorites.contains(cityName)) {
+                    removeLocationFromFavorites(cityName);
+                    Toast.makeText(MainActivity.this, cityName + " removed from favorites!", Toast.LENGTH_SHORT).show();
+                } else {
+                    addLocationToFavorites(cityName);
+                    Toast.makeText(MainActivity.this, cityName + " added to favorites!", Toast.LENGTH_SHORT).show();
+                }
+                updateFavoriteIcon(cityName, favoriteIV);
             }
         });
     }
@@ -193,5 +235,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         requestQueue.add(jsonObjectRequest);
+    }
+    private void addLocationToFavorites(String location) {
+        Set<String> newFavorites = new HashSet<>(favorites);
+        newFavorites.add(location);
+        prefs.edit().putStringSet("FavoriteLocations", newFavorites).commit(); // Commit the changes
+        // Update the favorites set
+        favorites = newFavorites;
+    }
+
+    private void removeLocationFromFavorites(String location) {
+        Set<String> newFavorites = new HashSet<>(favorites);
+        newFavorites.remove(location);
+        prefs.edit().putStringSet("FavoriteLocations", newFavorites).commit(); // Commit the changes
+        // Update the favorites set
+        favorites = newFavorites;
+    }
+
+    private boolean isLocationFavorite(String location) {
+        return favorites.contains(location);
+    }
+
+    private void updateFavoriteIcon(String location, ImageView favoriteIcon) {
+        if (isLocationFavorite(location)) {
+            favoriteIcon.setImageResource(R.drawable.filled_favorite);
+        } else {
+            favoriteIcon.setImageResource(R.drawable.favorite_icon);
+        }
     }
 }
