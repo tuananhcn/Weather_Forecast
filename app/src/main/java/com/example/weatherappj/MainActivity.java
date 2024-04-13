@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         weatherRvModelArrayList = new ArrayList<>();
         weatherRVAdapter = new WeatherRVAdapter(this, weatherRvModelArrayList);
         weatherRv.setAdapter(weatherRVAdapter);
-
+        favoriteIV = findViewById(R.id.iv_favorite);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
@@ -104,14 +104,13 @@ public class MainActivity extends AppCompatActivity {
         searchIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String city = cityEDT.getText().toString();
-                if (city.isEmpty()){
+                cityName = cityEDT.getText().toString(); //city
+                if (cityName.isEmpty()){ //city
                     Toast.makeText(MainActivity.this, "Please Enter City Name", Toast.LENGTH_SHORT).show();
                 }else {
                     cityNameTV.setText(cityName);
-                    getWeatherInfo(city);
-//                    updateFavoriteIcon(cityName, favoriteIV);
-
+                    getWeatherInfo(cityName); // city
+                    updateFavoriteIcon(cityName, favoriteIV);
                 }
             }
         });
@@ -123,12 +122,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-//        favoriteIV = findViewById(R.id.iv_favorite);
         prefs = getSharedPreferences("FAVORITES", MODE_PRIVATE);
         favorites = prefs.getStringSet("FavoriteLocations", new HashSet<>());
-        cityName = getCityName(location.getLongitude(), location.getLatitude());
+        Log.d("Test Favorite", "Favorite: " + favorites);
 //        updateFavoriteIcon(cityName, favoriteIV);
-        final ImageView favoriteIV = findViewById(R.id.iv_favorite);
+//        final ImageView favoriteIV = findViewById(R.id.iv_favorite);
         favoriteIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -237,19 +235,28 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
     private void addLocationToFavorites(String location) {
-        Set<String> newFavorites = new HashSet<>(favorites);
+        Set<String> currentFavorites = prefs.getStringSet("FavoriteLocations", new HashSet<>());
+        // Create a new set from the current one (important for SharedPreferences)
+        Set<String> newFavorites = new HashSet<>(currentFavorites);
+        // Add the new favorite
         newFavorites.add(location);
-        prefs.edit().putStringSet("FavoriteLocations", newFavorites).commit(); // Commit the changes
-        // Update the favorites set
-        favorites = newFavorites;
+        // Save the new set
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet("FavoriteLocations", newFavorites);
+        editor.apply(); // or editor.commit(); if you want to know the result
     }
 
     private void removeLocationFromFavorites(String location) {
-        Set<String> newFavorites = new HashSet<>(favorites);
+        // Retrieve the current favorites set
+        Set<String> currentFavorites = prefs.getStringSet("FavoriteLocations", new HashSet<>());
+        // Create a new set from the current one (important for SharedPreferences)
+        Set<String> newFavorites = new HashSet<>(currentFavorites);
+        // Remove the favorite
         newFavorites.remove(location);
-        prefs.edit().putStringSet("FavoriteLocations", newFavorites).commit(); // Commit the changes
-        // Update the favorites set
-        favorites = newFavorites;
+        // Save the new set
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet("FavoriteLocations", newFavorites);
+        editor.apply(); // or editor.commit(); if you want to know the result
     }
 
     private boolean isLocationFavorite(String location) {
