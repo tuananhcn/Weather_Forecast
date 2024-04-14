@@ -8,5 +8,5 @@
     <string name="forecast">Dự báo thời tiết</string>
     <string name="temp">23</string>
     <string name="condition">Điều kiện thời tiết</string>
-
+    <string name="favorite_btn">Ưa thích</string>
 </resources>

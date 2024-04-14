@@ -7,6 +7,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -252,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
                         cityName = city;
                     }else {
                         Log.d("TAG","CITY NOT FOUND");
-                        Toast.makeText(this, "User city not found..", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(this, "User city not found..", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -325,6 +329,41 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet("FavoriteLocations", newFavorites);
         editor.commit(); // or editor.commit(); if you want to know the result
+    }
+    private void displayWeatherNotification(String temperature, String condition, String iconUrl) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Tạo kênh thông báo cho Android O trở lên
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("weather", "Weather Updates", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // Tạo một Intent để mở MainActivity khi nhấp vào thông báo
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Xây dựng thông báo
+        Notification.Builder notificationBuilder = new Notification.Builder(this, "weather")
+                .setContentTitle("Thời tiết hiện tại: " + cityName)
+                .setContentText("Nhiệt độ: " + temperature + ", " + condition)
+                .setSmallIcon(R.drawable.cloudy) // Đặt một biểu tượng cho thông báo
+//                .setLargeIcon(Picasso.get().load(iconUrl).get()) // Lấy hình ảnh từ Picasso
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
+            notificationBuilder = new Notification.Builder(this)
+                    .setContentTitle("Thời tiết hiện tại: " + cityName)
+                    .setContentText("Nhiệt độ: " + temperature + ", " + condition)
+                    .setSmallIcon(R.drawable.cloudy)
+//                    .setLargeIcon(Picasso.get().load(iconUrl).get())
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true);
+        }
+
+        // Gửi thông báo
+        notificationManager.notify(1, notificationBuilder.build());
     }
 
     private void removeLocationFromFavorites(String location) {

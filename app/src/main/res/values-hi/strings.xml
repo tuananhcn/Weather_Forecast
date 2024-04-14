@@ -7,4 +7,5 @@
     <string name="forecast">मौसम पूर्वानुमान</string>
     <string name="temp">23</string>
     <string name="condition">मौसम की स्थिति</string>
+    <string name="favorite_btn">पसंदीदा</string>
 </resources>
