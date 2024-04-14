@@ -38,12 +38,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         String city = mFavorites.get(position);
         holder.textViewCityName.setText(city);
-        // Here, you may want to set the favorite icon based on whether the city is a favorite
-        // For example, if you have a method to check if a city is a favorite:
-        // boolean isFavorite = checkIsFavorite(city);
-        // holder.imageViewFavorite.setImageResource(isFavorite ? R.drawable.ic_favorite_filled : R.drawable.ic_favorite_border);
+        boolean isFavorite = checkIsFavorite(city);
+        holder.imageViewFavorite.setImageResource(isFavorite ? R.drawable.filled_favorite : R.drawable.favorite_icon);
     }
-
+    private boolean checkIsFavorite(String city) {
+        // This method should check if a city is in the favorites
+        // For example, if you have a way to access the current favorites from here
+        return mFavorites.contains(city);
+    }
     @Override
     public int getItemCount() {
         return mFavorites.size();
@@ -82,6 +84,10 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             });
         }
     }
-
+    public void updateFavoritesList(List<String> newFavorites) {
+        mFavorites.clear();
+        mFavorites.addAll(newFavorites);
+        notifyDataSetChanged(); // This will refresh the RecyclerView with the new favorites list
+    }
     // Additional methods for the adapter...
 }

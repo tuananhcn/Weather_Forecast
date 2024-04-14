@@ -3,6 +3,8 @@ package com.example.weatherappj;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.ImageView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +17,7 @@ public class FavoriteWeatherActivity extends AppCompatActivity implements Favori
     private SharedPreferences prefs;
     private Set<String> favoritesSet;
     private RecyclerView recyclerView;
+    private ImageView imageViewFavorite;
     private void removeLocationFromFavorites(String location) {
         // Retrieve the current favorites set
         Set<String> currentFavorites = prefs.getStringSet("FavoriteLocations", new HashSet<>());
@@ -35,7 +38,7 @@ public class FavoriteWeatherActivity extends AppCompatActivity implements Favori
         prefs = getSharedPreferences("FAVORITES", MODE_PRIVATE);
         List<String> favorites = new ArrayList<>(loadFavorites()); // Convert Set to List
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewFavorites);
+        recyclerView = findViewById(R.id.recyclerViewFavorites);
         recyclerView.setLayoutManager(new LinearLayoutManager(this)); // Set the LayoutManager
         FavoriteAdapter adapter = new FavoriteAdapter(this, favorites,this);
         recyclerView.setAdapter(adapter);
@@ -45,7 +48,10 @@ public class FavoriteWeatherActivity extends AppCompatActivity implements Favori
         removeLocationFromFavorites(location);
         // Update the list and adapter after removing the item
         List<String> updatedFavorites = new ArrayList<>(loadFavorites());
-        recyclerView.setAdapter(new FavoriteAdapter(this, updatedFavorites, this));
+        FavoriteAdapter adapter = (FavoriteAdapter) recyclerView.getAdapter();
+        if (adapter != null) {
+            adapter.updateFavoritesList(updatedFavorites);
+        }
     }
 
     @Override
@@ -61,4 +67,5 @@ public class FavoriteWeatherActivity extends AppCompatActivity implements Favori
         favoritesSet = prefs.getStringSet("FavoriteLocations", new HashSet<>());
         return favoritesSet; // Return the Set of favorites
     }
+
 }

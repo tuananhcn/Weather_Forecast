@@ -346,4 +346,30 @@ public class MainActivity extends AppCompatActivity {
             favoriteIcon.setImageResource(R.drawable.favorite_icon);
         }
     }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Handle the intent from FavoriteWeatherActivity
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("CITY_NAME")) {
+            String city = intent.getStringExtra("CITY_NAME");
+            if (city != null && !city.isEmpty()) {
+                cityNameTV.setText(city);
+                getWeatherInfo(city); // Perform the search
+                updateFavoriteIcon(city, favoriteIV); // Update the favorite icon
+            }
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Refresh the favorites set from SharedPreferences
+        prefs = getSharedPreferences("FAVORITES", MODE_PRIVATE);
+        favorites = new HashSet<>(prefs.getStringSet("FavoriteLocations", new HashSet<>()));
+        // Only update the icon if cityName is not null and not empty
+        if (cityName != null && !cityName.isEmpty()) {
+            updateFavoriteIcon(cityName, favoriteIV);
+        }
+    }
 }
