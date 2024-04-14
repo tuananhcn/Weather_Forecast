@@ -211,6 +211,29 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        ImageView ivShare = findViewById(R.id.IdIvShare);
+        ivShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (temperatureTV.getText() != null && conditionTv.getText() != null) {
+                    // Lấy thông tin từ các TextView
+                    String cityName = cityNameTV.getText().toString();
+                    String temperature = temperatureTV.getText().toString();
+                    String condition = conditionTv.getText().toString();
+
+                    String dataToShare = "City: " + cityName + "\n"
+                            + "Temperature: " + temperature + "\n"
+                            + "Condition: " + condition;
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, dataToShare);
+                    startActivity(Intent.createChooser(shareIntent, "Chia sẻ qua"));
+                } else {
+                    Toast.makeText(getApplicationContext(), "Không thể chia sẻ do thiếu thông tin", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
     private void getLocationAndWeatherInfo() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)

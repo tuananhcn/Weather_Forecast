@@ -147,7 +147,7 @@
             android:textColor="@color/white" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_above="@+id/Idrvweather"
@@ -155,6 +155,20 @@
             android:text="@string/forecast"
             android:textColor="@color/white"
             android:textStyle="bold"/>
+        <ImageView
+            android:id="@+id/IdIvShare"
+            android:layout_width="100dp"
+            android:layout_height="25dp"
+            android:layout_above="@+id/Idrvweather"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:layout_marginEnd="301dp"
+            android:layout_marginBottom="678dp"
+            android:layout_weight="0.5"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_share"
+            app:tint="@color/white" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
