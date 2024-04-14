@@ -287,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
                     String conditionIcon = response.getJSONObject("current").getJSONObject("condition").getString("icon");
                     Picasso.get().load("http:".concat(conditionIcon)).into(iconIV);
                     conditionTv.setText(condition);
+                    displayWeatherNotification(temperature, condition, conditionIcon);
                     if (isDay==1){
                         //morning
                         Picasso.get().load("https://images.unsplash.com/photo-1444041103143-1d0586b9c0b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80").into(backIV);
@@ -332,18 +333,27 @@ public class MainActivity extends AppCompatActivity {
     }
     private void displayWeatherNotification(String temperature, String condition, String iconUrl) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) {
+            return; // Exit if NotificationManager not available
+        }
 
-        // Tạo kênh thông báo cho Android O trở lên
+        String channelId = "weather"; // The id of the channel.
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("weather", "Weather Updates", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    "Weather Updates",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
             notificationManager.createNotificationChannel(channel);
         }
 
-        // Tạo một Intent để mở MainActivity khi nhấp vào thông báo
         Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = null;
+        int pendingIntentFlag = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M ?
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
 
-        // Xây dựng thông báo
+        pendingIntent = PendingIntent.getActivity(this, 0, intent, pendingIntentFlag);
         Notification.Builder notificationBuilder = new Notification.Builder(this, "weather")
                 .setContentTitle("Thời tiết hiện tại: " + cityName)
                 .setContentText("Nhiệt độ: " + temperature + ", " + condition)
@@ -353,13 +363,7 @@ public class MainActivity extends AppCompatActivity {
                 .setAutoCancel(true);
 
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
-            notificationBuilder = new Notification.Builder(this)
-                    .setContentTitle("Thời tiết hiện tại: " + cityName)
-                    .setContentText("Nhiệt độ: " + temperature + ", " + condition)
-                    .setSmallIcon(R.drawable.cloudy)
-//                    .setLargeIcon(Picasso.get().load(iconUrl).get())
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true);
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
         }
 
         // Gửi thông báo
