@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     cityNameTV.setText(cityName);
                     getWeatherInfo(cityName); // city
-                    updateFavoriteIcon(cityName, favoriteIV);
+                    refreshFavoritesAndUI();
                 }
             }
         });
@@ -203,7 +203,12 @@ public class MainActivity extends AppCompatActivity {
                     addLocationToFavorites(cityName);
                     Toast.makeText(MainActivity.this, cityName + " added to favorites!", Toast.LENGTH_SHORT).show();
                 }
-                updateFavoriteIcon(cityName, favoriteIV);
+                favoriteIV.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshFavoritesAndUI();
+                    }
+                });
             }
         });
     }
@@ -319,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
         // Save the new set
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet("FavoriteLocations", newFavorites);
-        editor.apply(); // or editor.commit(); if you want to know the result
+        editor.commit(); // or editor.commit(); if you want to know the result
     }
 
     private void removeLocationFromFavorites(String location) {
@@ -332,11 +337,13 @@ public class MainActivity extends AppCompatActivity {
         // Save the new set
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet("FavoriteLocations", newFavorites);
-        editor.apply(); // or editor.commit(); if you want to know the result
+        editor.commit(); // or editor.commit(); if you want to know the result
     }
 
     private boolean isLocationFavorite(String location) {
-        return favorites.contains(location);
+        boolean isFavorite = favorites.contains(location);
+        Log.d("MainActivity", "isLocationFavorite: " + location + " - " + isFavorite);
+        return isFavorite;
     }
 
     private void updateFavoriteIcon(String location, ImageView favoriteIcon) {
@@ -346,30 +353,35 @@ public class MainActivity extends AppCompatActivity {
             favoriteIcon.setImageResource(R.drawable.favorite_icon);
         }
     }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Handle the intent from FavoriteWeatherActivity
-        Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("CITY_NAME")) {
-            String city = intent.getStringExtra("CITY_NAME");
-            if (city != null && !city.isEmpty()) {
-                cityNameTV.setText(city);
-                getWeatherInfo(city); // Perform the search
-                updateFavoriteIcon(city, favoriteIV); // Update the favorite icon
-            }
-        }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        // Handle the intent from FavoriteWeatherActivity
+//        Intent intent = getIntent();
+//        if (intent != null && intent.hasExtra("CITY_NAME")) {
+//            String city = intent.getStringExtra("CITY_NAME");
+//            if (city != null && !city.isEmpty()) {
+//                cityNameTV.setText(city);
+//                getWeatherInfo(city); // Perform the search
+//                updateFavoriteIcon(city, favoriteIV); // Update the favorite icon
+//            }
+//        }
+//    }
+private void refreshFavoritesAndUI() {
+    // Always get the latest set of favorites from SharedPreferences
+    prefs = getSharedPreferences("FAVORITES", MODE_PRIVATE);
+    favorites = new HashSet<>(prefs.getStringSet("FavoriteLocations", new HashSet<>()));
+
+    // Refresh the UI with the updated favorite icon
+    if (cityName != null && !cityName.isEmpty()) {
+        updateFavoriteIcon(cityName, favoriteIV);
     }
+}
+
     @Override
     protected void onResume() {
         super.onResume();
-
-        // Refresh the favorites set from SharedPreferences
-        prefs = getSharedPreferences("FAVORITES", MODE_PRIVATE);
-        favorites = new HashSet<>(prefs.getStringSet("FavoriteLocations", new HashSet<>()));
-        // Only update the icon if cityName is not null and not empty
-        if (cityName != null && !cityName.isEmpty()) {
-            updateFavoriteIcon(cityName, favoriteIV);
-        }
+        refreshFavoritesAndUI();
     }
+
 }
