@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -21,6 +23,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -43,8 +46,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,8 +73,9 @@ public class MainActivity extends AppCompatActivity {
         Configuration config = resources.getConfiguration();
         config.setLocale(locale);
         resources.updateConfiguration(config,resources.getDisplayMetrics());
-
-    }
+    private ImageView favoriteIV;
+    private Set<String> favorites;
+    private SharedPreferences prefs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,8 +95,7 @@ public class MainActivity extends AppCompatActivity {
         weatherRvModelArrayList = new ArrayList<>();
         weatherRVAdapter = new WeatherRVAdapter(this, weatherRvModelArrayList);
         weatherRv.setAdapter(weatherRVAdapter);
-
-
+        favoriteIV = findViewById(R.id.iv_favorite);
         spinner = findViewById(R.id.spinnerLanguage);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, languages );
@@ -122,8 +127,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
@@ -134,23 +137,56 @@ public class MainActivity extends AppCompatActivity {
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (location != null){cityName = getCityName(location.getLongitude(),location.getLatitude());
             getWeatherInfo(cityName);
+//            updateFavoriteIcon(cityName, favoriteIV);
         } else {
               cityName = "Ranchi";
              getWeatherInfo(cityName);
-           // Toast.makeText(this, "Invalid User's Location", Toast.LENGTH_SHORT).show();
+//            updateFavoriteIcon(cityName, favoriteIV);
+
+            // Toast.makeText(this, "Invalid User's Location", Toast.LENGTH_SHORT).show();
 
         }
 
         searchIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String city = cityEDT.getText().toString();
-                if (city.isEmpty()){
+                cityName = cityEDT.getText().toString(); //city
+                if (cityName.isEmpty()){ //city
                     Toast.makeText(MainActivity.this, "Please Enter City Name", Toast.LENGTH_SHORT).show();
                 }else {
                     cityNameTV.setText(cityName);
-                    getWeatherInfo(city);
+                    getWeatherInfo(cityName); // city
+                    updateFavoriteIcon(cityName, favoriteIV);
                 }
+            }
+        });
+        Button btnFavWeather = findViewById(R.id.btnFavWeather);
+        btnFavWeather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, FavoriteWeatherActivity.class);
+                startActivity(intent);
+            }
+        });
+        prefs = getSharedPreferences("FAVORITES", MODE_PRIVATE);
+        favorites = prefs.getStringSet("FavoriteLocations", new HashSet<>());
+        Log.d("Test Favorite", "Favorite: " + favorites);
+//        updateFavoriteIcon(cityName, favoriteIV);
+//        final ImageView favoriteIV = findViewById(R.id.iv_favorite);
+        favoriteIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Refresh the favorites set from SharedPreferences
+                favorites = new HashSet<>(prefs.getStringSet("FavoriteLocations", new HashSet<>()));
+
+                if (favorites.contains(cityName)) {
+                    removeLocationFromFavorites(cityName);
+                    Toast.makeText(MainActivity.this, cityName + " removed from favorites!", Toast.LENGTH_SHORT).show();
+                } else {
+                    addLocationToFavorites(cityName);
+                    Toast.makeText(MainActivity.this, cityName + " added to favorites!", Toast.LENGTH_SHORT).show();
+                }
+                updateFavoriteIcon(cityName, favoriteIV);
             }
         });
     }
@@ -244,6 +280,40 @@ public class MainActivity extends AppCompatActivity {
         });
         requestQueue.add(jsonObjectRequest);
     }
+    private void addLocationToFavorites(String location) {
+        Set<String> currentFavorites = prefs.getStringSet("FavoriteLocations", new HashSet<>());
+        // Create a new set from the current one (important for SharedPreferences)
+        Set<String> newFavorites = new HashSet<>(currentFavorites);
+        // Add the new favorite
+        newFavorites.add(location);
+        // Save the new set
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet("FavoriteLocations", newFavorites);
+        editor.apply(); // or editor.commit(); if you want to know the result
+    }
 
+    private void removeLocationFromFavorites(String location) {
+        // Retrieve the current favorites set
+        Set<String> currentFavorites = prefs.getStringSet("FavoriteLocations", new HashSet<>());
+        // Create a new set from the current one (important for SharedPreferences)
+        Set<String> newFavorites = new HashSet<>(currentFavorites);
+        // Remove the favorite
+        newFavorites.remove(location);
+        // Save the new set
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet("FavoriteLocations", newFavorites);
+        editor.apply(); // or editor.commit(); if you want to know the result
+    }
 
+    private boolean isLocationFavorite(String location) {
+        return favorites.contains(location);
+    }
+
+    private void updateFavoriteIcon(String location, ImageView favoriteIcon) {
+        if (isLocationFavorite(location)) {
+            favoriteIcon.setImageResource(R.drawable.filled_favorite);
+        } else {
+            favoriteIcon.setImageResource(R.drawable.favorite_icon);
+        }
+    }
 }
