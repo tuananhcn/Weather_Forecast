@@ -1,30 +1,47 @@
 package com.example.weatherappj;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
-import android.widget.TextView;
+
 import java.util.List;
 
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
-    private List<String> mFavorites; // Danh sách các khu vực
-
-    public FavoriteAdapter(List<String> favorites) {
-        mFavorites = favorites;
+    private List<String> mFavorites; // This list should contain the cities
+    private LayoutInflater mInflater;
+    private Context mContext;
+    public interface FavoriteItemListener {
+        void onFavoriteIconClicked(String location);
+        void onCityClicked(String location);
+    }
+    private FavoriteItemListener listener;
+    public FavoriteAdapter(Context context, List<String> favorites, FavoriteItemListener listener) {
+        this.mInflater = LayoutInflater.from(context);
+        this.mFavorites = favorites;
+        this.mContext = context;
+        this.listener = listener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.favorite_activity, parent, false);
+        View view = mInflater.inflate(R.layout.favorite_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String favorite = mFavorites.get(position);
-        holder.textViewFavorite.setText(favorite);
+        String city = mFavorites.get(position);
+        holder.textViewCityName.setText(city);
+        // Here, you may want to set the favorite icon based on whether the city is a favorite
+        // For example, if you have a method to check if a city is a favorite:
+        // boolean isFavorite = checkIsFavorite(city);
+        // holder.imageViewFavorite.setImageResource(isFavorite ? R.drawable.ic_favorite_filled : R.drawable.ic_favorite_border);
     }
 
     @Override
@@ -32,13 +49,39 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         return mFavorites.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView textViewFavorite;
-
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView textViewCityName;
+        public ImageView imageViewFavorite;
+        private RelativeLayout itemLayout;
         public ViewHolder(View itemView) {
             super(itemView);
-            textViewFavorite = (TextView) itemView.findViewById(R.id.textViewFavorite);
+            textViewCityName = itemView.findViewById(R.id.textViewCityName);
+            imageViewFavorite = itemView.findViewById(R.id.imageViewFavorite);
+            itemLayout = itemView.findViewById(R.id.relativeLayoutItem);
+            // Set up the click listener for the favorite icon
+            imageViewFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        String city = mFavorites.get(position);
+                        listener.onFavoriteIconClicked(city);
+                    }
+                }
+
+            });
+            itemLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        String city = mFavorites.get(position);
+                        listener.onCityClicked(city);
+                    }
+                }
+            });
         }
     }
-}
 
+    // Additional methods for the adapter...
+}

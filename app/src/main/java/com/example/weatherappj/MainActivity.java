@@ -65,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private int PERMISSION_CODE = 1;
     Spinner spinner;
+    private ImageView favoriteIV;
+    private Set<String> favorites;
+    private SharedPreferences prefs;
     public static final String[] languages ={"Select Language","English","Vietnamese","Hindi"};
     public void setLocal(Activity activity, String langCode) {
         Locale locale = new Locale(langCode);
@@ -72,10 +75,8 @@ public class MainActivity extends AppCompatActivity {
         Resources resources = activity.getResources();
         Configuration config = resources.getConfiguration();
         config.setLocale(locale);
-        resources.updateConfiguration(config,resources.getDisplayMetrics());
-    private ImageView favoriteIV;
-    private Set<String> favorites;
-    private SharedPreferences prefs;
+        resources.updateConfiguration(config, resources.getDisplayMetrics());
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +120,14 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                     startActivity(getIntent());
                 }
+                Intent intent = getIntent();
+                if (intent != null && intent.hasExtra("CITY_NAME")) {
+                    String city = intent.getStringExtra("CITY_NAME");
+                    if (city != null && !city.isEmpty()) {
+                        cityNameTV.setText(city);
+                        getWeatherInfo(city); // Perform the search
+                    }
+                }
             }
 
             @Override
@@ -129,23 +138,31 @@ public class MainActivity extends AppCompatActivity {
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ;
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.
                 ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_CODE);
-
-        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if (location != null){cityName = getCityName(location.getLongitude(),location.getLatitude());
-            getWeatherInfo(cityName);
-//            updateFavoriteIcon(cityName, favoriteIV);
-        } else {
-              cityName = "Ranchi";
-             getWeatherInfo(cityName);
-//            updateFavoriteIcon(cityName, favoriteIV);
-
-            // Toast.makeText(this, "Invalid User's Location", Toast.LENGTH_SHORT).show();
-
         }
+        else {
+            getLocationAndWeatherInfo(); // Permissions already granted, proceed to get location and weather info
+        }
+//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+//                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ;
+//        ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.
+//                ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_CODE);
+//
+//            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//        if (location != null){cityName = getCityName(location.getLongitude(),location.getLatitude());
+//            getWeatherInfo(cityName);
+////            updateFavoriteIcon(cityName, favoriteIV);
+//        } else {
+//              cityName = "Ranchi";
+//             getWeatherInfo(cityName);
+////            updateFavoriteIcon(cityName, favoriteIV);
+//
+//            // Toast.makeText(this, "Invalid User's Location", Toast.LENGTH_SHORT).show();
+//
+//        }
 
         searchIV.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,13 +207,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    private void getLocationAndWeatherInfo() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (location != null) {
+                cityName = getCityName(location.getLongitude(), location.getLatitude());
+                getWeatherInfo(cityName);
+            } else {
+                cityName = "Ranchi"; // Default city or let the user choose one
+                getWeatherInfo(cityName);
+            }
+        }
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode==PERMISSION_CODE){
             if (grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(this, "Permission granted....", Toast.LENGTH_SHORT).show();
+                getLocationAndWeatherInfo();
             }else {
                 Toast.makeText(this, "Please Provide the permission...", Toast.LENGTH_SHORT).show();
                 finish();
