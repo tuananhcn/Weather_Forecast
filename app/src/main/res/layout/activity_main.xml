@@ -17,10 +17,10 @@
         android:id="@+id/btnFavWeather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Favorites"
+        android:text="@string/favorite"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:margin="10dp"/>
+        android:layout_margin="10dp"/>
     <Spinner
         android:id="@+id/spinnerLanguage"
         android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
             android:layout_marginTop="30dp"
             android:gravity="center"
             android:padding="20dp"
-            android:text="City Name"
+            android:text="@string/city_name"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp"/>
@@ -70,7 +70,7 @@
                 android:layout_weight="4.5"
                 app:boxStrokeColor="@android:color/transparent"
                 android:background="@android:color/transparent"
-                android:hint="Enter City Name"
+                android:hint="@string/enter_city_name"
                 android:padding="5dp"
                 app:hintTextColor="@color/white"
                 android:textColorHint="@color/white">
@@ -108,7 +108,7 @@
             android:layout_margin="10dp"
             android:gravity="center_horizontal"
             android:padding="5dp"
-            android:text="23"
+            android:text="@string/temp"
             android:textColor="@color/white"
             android:textSize="70dp"/>
 
@@ -122,15 +122,18 @@
             android:src="@mipmap/ic_launcher"/>
 
         <TextView
+            android:id="@+id/IDtVCondition"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/IDtVCondition"
-            android:layout_margin="10dp"
+            android:layout_below="@+id/IdIvIcon"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
+            android:text="@string/condition"
             android:textAlignment="center"
-            android:text="Condition"
-            android:textColor="@color/white"
-            android:layout_below="@+id/IdIvIcon"/>
+            android:textColor="@color/white" />
 
         <TextView
             android:layout_width="match_parent"
@@ -138,7 +141,7 @@
             android:layout_margin="8dp"
             android:layout_above="@+id/Idrvweather"
             android:layout_marginBottom="10dp"
-            android:text="Today's weather forecast"
+            android:text="@string/forecast"
             android:textColor="@color/white"
             android:textStyle="bold"/>
 

@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WeatherAppJ</string>
+    <string name="favorite">Favorite</string>
+    <string name="city_name">City Name</string>
+    <string name="enter_city_name">Enter City Name</string>
+    <string name="forecast">Weather Forecast (for today)</string>
+    <string name="temp">23</string>
+    <string name="condition">Condition</string>
 </resources>
