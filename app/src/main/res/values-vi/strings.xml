@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- tiếng Việt -->
+    <string name="app_name">WeatherAppJ</string>
+    <string name="favorite">Yêu thích</string>
+    <string name="city_name">Tên thành phố</string>
+    <string name="enter_city_name">Nhập tên thành phố</string>
+    <string name="forecast">Dự báo thời tiết</string>
+    <string name="temp">23</string>
+    <string name="condition">Điều kiện thời tiết</string>
+
+</resources>

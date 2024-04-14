@@ -5,11 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -18,10 +21,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +64,15 @@ public class MainActivity extends AppCompatActivity {
     private WeatherRVAdapter weatherRVAdapter;
     private LocationManager locationManager;
     private int PERMISSION_CODE = 1;
+    Spinner spinner;
+    public static final String[] languages ={"Select Language","English","Vietnamese","Hindi"};
+    public void setLocal(Activity activity, String langCode) {
+        Locale locale = new Locale(langCode);
+        locale.setDefault(locale);
+        Resources resources = activity.getResources();
+        Configuration config = resources.getConfiguration();
+        config.setLocale(locale);
+        resources.updateConfiguration(config,resources.getDisplayMetrics());
     private ImageView favoriteIV;
     private Set<String> favorites;
     private SharedPreferences prefs;
@@ -81,6 +96,37 @@ public class MainActivity extends AppCompatActivity {
         weatherRVAdapter = new WeatherRVAdapter(this, weatherRvModelArrayList);
         weatherRv.setAdapter(weatherRVAdapter);
         favoriteIV = findViewById(R.id.iv_favorite);
+        spinner = findViewById(R.id.spinnerLanguage);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, languages );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(0);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+                String selectedLang = adapterView.getItemAtPosition(pos).toString();
+                if ( selectedLang.equals("English")){
+                    setLocal(MainActivity.this,"en");
+                    finish();
+                    startActivity(getIntent());
+                } else if (selectedLang.equals("Vietnamese")) {
+                    setLocal(MainActivity.this, "vi");
+                    finish();
+                    startActivity(getIntent());
+                }else if(selectedLang.equals("Hindi")){
+                    setLocal(MainActivity.this,"hi");
+                    finish();
+                    startActivity(getIntent());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,

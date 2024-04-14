@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WeatherAppJ</string>
+    <string name="favorite">पसंदीदा</string>
+    <string name="city_name">शहर का नाम</string>
+    <string name="enter_city_name">शहर का नाम दर्ज करें</string>
+    <string name="forecast">मौसम पूर्वानुमान</string>
+    <string name="temp">23</string>
+    <string name="condition">मौसम की स्थिति</string>
+</resources>
