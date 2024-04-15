@@ -41,7 +41,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.weatherappj.databinding.ActivityMainBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -73,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
     private Set<String> favorites;
     private SharedPreferences prefs;
     public static final String[] languages ={"Select Language","English","Vietnamese","Hindi"};
+    ActivityMainBinding binding;
+    String searchText;
+    FirebaseDatabase db;
+    DatabaseReference reference;
     public void setLocal(Activity activity, String langCode) {
         Locale locale = new Locale(langCode);
         locale.setDefault(locale);
@@ -86,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
         setContentView(R.layout.activity_main);
         homeRL = findViewById(R.id.IdRlHome);
         loadingPB = findViewById(R.id.IdPbLoading);
@@ -102,6 +112,16 @@ public class MainActivity extends AppCompatActivity {
         weatherRv.setAdapter(weatherRVAdapter);
         favoriteIV = findViewById(R.id.iv_favorite);
         spinner = findViewById(R.id.spinnerLanguage);
+
+        reference = FirebaseDatabase.getInstance().getReference("SearchData");
+
+//        searchIV.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//            }
+//        });
+
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, languages );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -307,6 +327,12 @@ public class MainActivity extends AppCompatActivity {
                         weatherRvModelArrayList.add(new WeatherRvModel(time, temper, img, wind));
                     }
                     weatherRVAdapter.notifyDataSetChanged();
+                    String forecastDay = forcastO.toString();
+                    String data = cityEDT.getText().toString();
+                    SearchData searchData = new SearchData(data,forecastDay);
+
+                    reference.child(data).setValue(searchData);
+
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -380,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
         // Save the new set
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet("FavoriteLocations", newFavorites);
-        editor.commit(); // or editor.commit(); if you want to know the result
+        editor.commit(); // or edl.itor.commit(); if you want to know the result
     }
 
     private boolean isLocationFavorite(String location) {

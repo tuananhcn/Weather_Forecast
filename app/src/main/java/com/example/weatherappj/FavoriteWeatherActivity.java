@@ -38,6 +38,8 @@ public class FavoriteWeatherActivity extends AppCompatActivity implements Favori
         prefs = getSharedPreferences("FAVORITES", MODE_PRIVATE);
         List<String> favorites = new ArrayList<>(loadFavorites()); // Convert Set to List
 
+
+
         recyclerView = findViewById(R.id.recyclerViewFavorites);
         recyclerView.setLayoutManager(new LinearLayoutManager(this)); // Set the LayoutManager
         FavoriteAdapter adapter = new FavoriteAdapter(this, favorites,this);
