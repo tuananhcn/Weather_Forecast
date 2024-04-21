@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
     private RelativeLayout homeRL;
+    private Intent ChartIntent;
     private String cityName;
     private ProgressBar loadingPB;
     private TextView cityNameTV, temperatureTV, conditionTv;
@@ -272,6 +273,8 @@ public class MainActivity extends AppCompatActivity {
                             setLocal(MainActivity.this, "vi");
                             finish();
                             startActivity(getIntent());
+                        } else if (id == R.id.nav_chart) {
+                            startActivity(ChartIntent);
                         }
                         // Add other language handling as necessary
 
@@ -362,7 +365,11 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject forecastObj = response.getJSONObject("forecast");
                     JSONObject forcastO = forecastObj.getJSONArray("forecastday").getJSONObject(0);
                     JSONArray hourArray = forcastO.getJSONArray("hour");
-
+                    ArrayList<Float> hourlyTemperatures = new ArrayList<>();
+                    ArrayList<Float> hourlyRain = new ArrayList<>();
+                    ArrayList<Float> hourlyUVIndex = new ArrayList<>();
+                    ArrayList<Float> hourlyWindSpeed = new ArrayList<>();
+                    ArrayList<Float> hourlyHumidity = new ArrayList<>();
                     for(int i=0; i<hourArray.length(); i++){
                         JSONObject hourObj = hourArray.getJSONObject(i);
                         String time = hourObj.getString("time");
@@ -370,7 +377,18 @@ public class MainActivity extends AppCompatActivity {
                         String img = hourObj.getJSONObject("condition").getString("icon");
                         String wind = hourObj.getString("wind_kph");
                         weatherRvModelArrayList.add(new WeatherRvModel(time, temper, img, wind));
+                        hourlyTemperatures.add((float) hourObj.getDouble("temp_c"));
+                        hourlyRain.add((float) hourObj.getDouble("precip_mm"));
+                        hourlyUVIndex.add((float) hourObj.getDouble("uv"));
+                        hourlyWindSpeed.add((float) hourObj.getDouble("wind_kph"));
+                        hourlyHumidity.add((float) hourObj.getDouble("humidity"));
                     }
+                    ChartIntent = new Intent(MainActivity.this, ChartActivity.class);
+                    ChartIntent.putExtra("HourlyTemperatures", hourlyTemperatures);
+                    ChartIntent.putExtra("HourlyRain", hourlyRain);
+                    ChartIntent.putExtra("HourlyUVIndex", hourlyUVIndex);
+                    ChartIntent.putExtra("HourlyWindSpeed", hourlyWindSpeed);
+                    ChartIntent.putExtra("HourlyHumidity", hourlyHumidity);
                     weatherRVAdapter.notifyDataSetChanged();
                     Date currentDate = new Date();
 

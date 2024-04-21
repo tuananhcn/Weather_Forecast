@@ -9,6 +9,10 @@
         android:id="@+id/nav_share"
         android:icon="@drawable/ic_share"
         android:title="Share" />
+    <item
+        android:id="@+id/nav_chart"
+        android:icon="@drawable/ic_share"
+        android:title="Chart" />
     <item android:id="@+id/nav_language"
         android:title="Language">
         <menu>
