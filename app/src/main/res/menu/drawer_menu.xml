@@ -8,24 +8,24 @@
     <item
         android:id="@+id/nav_share"
         android:icon="@drawable/ic_share"
-        android:title="Share" />
+        android:title="@string/Share" />
     <item
         android:id="@+id/nav_chart"
         android:icon="@drawable/baseline_bar_chart_24"
-        android:title="Chart" />
+        android:title="@string/Chart" />
     <item android:id="@+id/nav_language"
-        android:title="Language">
+        android:title="@string/language">
         <menu>
             <!-- Sub-items for language selection here, as an example -->
             <item
                 android:id="@+id/lang_english"
-                android:title="English" />
+                android:title="@string/English" />
             <item
                 android:id="@+id/lang_hindi"
-                android:title="Hindi" />
+                android:title="@string/Hindi" />
             <item
                 android:id="@+id/lang_vietnamese"
-                android:title="Vietnamese" />
+                android:title="@string/Vietnamese" />
             <!-- Add other languages here -->
         </menu>
     </item>

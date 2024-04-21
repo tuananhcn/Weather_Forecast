@@ -10,4 +10,13 @@
     <string name="favorite_btn">Favorites</string>
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
+    <string name="English">English</string>
+    <string name="language">Language</string>
+    <string name="Vietnamese">Vietnamese</string>
+    <string name="Hindi">Hindi</string>
+    <string name="Share">Share</string>
+    <string name="Weather_Forecast">Weather Forecast</string>
+    <string name="Chart">Chart</string>
+    <string name="current_weather">Current weather: %1$s</string>
+    <string name="temperature_condition">Temperature: %1$s, %2$s</string>
 </resources>

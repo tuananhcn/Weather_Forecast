@@ -10,4 +10,13 @@
     <string name="favorite_btn">पसंदीदा</string>
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
+    <string name="English">अंग्रेज़ी</string>
+    <string name="language">भाषा</string>
+    <string name="Vietnamese">वियतनामी</string>
+    <string name="Hindi">हिंदी</string>
+    <string name="Share">शेयर करना</string>
+    <string name="Weather_Forecast">मौसम पूर्वानुमान</string>
+    <string name="Chart">चार्ट</string>
+    <string name="current_weather">मौसम: %1$s</string>
+    <string name="temperature_condition">तापमान: %1$s, %2$s</string>
 </resources>

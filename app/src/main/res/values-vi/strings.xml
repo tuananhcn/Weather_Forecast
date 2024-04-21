@@ -11,4 +11,13 @@
     <string name="favorite_btn">Ưa thích</string>
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
+    <string name="English">Tiếng Anh</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="Vietnamese">Tiếng Việt</string>
+    <string name="Hindi">Tiếng Hindi</string>
+    <string name="Share">Chia sẻ</string>
+    <string name="Weather_Forecast">Dự báo thời tiết</string>
+    <string name="Chart">Đồ thị</string>
+    <string name="current_weather">Thời tiết hiện tại: %s</string>
+    <string name="temperature_condition">Nhiệt độ: %s, %s</string>
 </resources>

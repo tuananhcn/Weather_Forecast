@@ -430,8 +430,8 @@ public class MainActivity extends AppCompatActivity {
 
         pendingIntent = PendingIntent.getActivity(this, 0, intent, pendingIntentFlag);
         Notification.Builder notificationBuilder = new Notification.Builder(this, "weather")
-                .setContentTitle("Thời tiết hiện tại: " + cityName)
-                .setContentText("Nhiệt độ: " + temperature + ", " + condition)
+                .setContentTitle(String.format(getString(R.string.current_weather), cityName))
+                .setContentText(String.format(getString(R.string.temperature_condition), temperature, condition))
                 .setSmallIcon(R.drawable.cloudy) // Đặt một biểu tượng cho thông báo
 //                .setLargeIcon(Picasso.get().load(iconUrl).get()) // Lấy hình ảnh từ Picasso
                 .setContentIntent(pendingIntent)
@@ -481,6 +481,7 @@ public class MainActivity extends AppCompatActivity {
             if (city != null && !city.isEmpty()) {
                 cityNameTV.setText(city);
                 getWeatherInfo(city); // Perform the search
+                refreshFavoritesAndUI();
                 updateFavoriteIcon(city, favoriteIV); // Update the favorite icon
             }
         }
@@ -499,7 +500,7 @@ private void refreshFavoritesAndUI() {
     @Override
     protected void onResume() {
         super.onResume();
-        refreshFavoritesAndUI();
+//        refreshFavoritesAndUI();
     }
     @Override
     public void onBackPressed() {

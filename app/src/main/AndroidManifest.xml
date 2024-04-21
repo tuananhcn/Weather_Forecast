@@ -16,7 +16,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/cloudy"
         android:roundIcon="@drawable/cloudy"
-        android:label="Weather Forecast"
+        android:label="@string/Weather_Forecast"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.WeatherAppJ"
