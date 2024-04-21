@@ -11,7 +11,7 @@
         android:title="Share" />
     <item
         android:id="@+id/nav_chart"
-        android:icon="@drawable/ic_share"
+        android:icon="@drawable/baseline_bar_chart_24"
         android:title="Chart" />
     <item android:id="@+id/nav_language"
         android:title="Language">
