@@ -1,8 +1,12 @@
 package com.example.weatherappj;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
@@ -23,6 +27,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -44,6 +49,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.weatherappj.databinding.ActivityMainBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -54,14 +60,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle toggle;
     private RelativeLayout homeRL;
     private String cityName;
     private ProgressBar loadingPB;
@@ -73,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
     private WeatherRVAdapter weatherRVAdapter;
     private LocationManager locationManager;
     private int PERMISSION_CODE = 1;
-    Spinner spinner;
     private ImageView favoriteIV;
     private Set<String> favorites;
     private SharedPreferences prefs;
@@ -93,10 +101,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        // Transparent Toolbar
+        toolbar.getBackground().setAlpha(0);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
-        setContentView(R.layout.activity_main);
+
         homeRL = findViewById(R.id.IdRlHome);
         loadingPB = findViewById(R.id.IdPbLoading);
         cityNameTV = findViewById(R.id.IdTvCityName);
@@ -111,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
         weatherRVAdapter = new WeatherRVAdapter(this, weatherRvModelArrayList);
         weatherRv.setAdapter(weatherRVAdapter);
         favoriteIV = findViewById(R.id.iv_favorite);
-        spinner = findViewById(R.id.spinnerLanguage);
 
         reference = FirebaseDatabase.getInstance().getReference("SearchData");
 
@@ -121,44 +142,6 @@ public class MainActivity extends AppCompatActivity {
 //
 //            }
 //        });
-
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, languages );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setSelection(0);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                String selectedLang = adapterView.getItemAtPosition(pos).toString();
-                if ( selectedLang.equals("English")){
-                    setLocal(MainActivity.this,"en");
-                    finish();
-                    startActivity(getIntent());
-                } else if (selectedLang.equals("Vietnamese")) {
-                    setLocal(MainActivity.this, "vi");
-                    finish();
-                    startActivity(getIntent());
-                }else if(selectedLang.equals("Hindi")){
-                    setLocal(MainActivity.this,"hi");
-                    finish();
-                    startActivity(getIntent());
-                }
-                Intent intent = getIntent();
-                if (intent != null && intent.hasExtra("CITY_NAME")) {
-                    String city = intent.getStringExtra("CITY_NAME");
-                    if (city != null && !city.isEmpty()) {
-                        cityNameTV.setText(city);
-                        getWeatherInfo(city); // Perform the search
-                    }
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -201,14 +184,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        Button btnFavWeather = findViewById(R.id.btnFavWeather);
-        btnFavWeather.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, FavoriteWeatherActivity.class);
-                startActivity(intent);
-            }
-        });
         prefs = getSharedPreferences("FAVORITES", MODE_PRIVATE);
         favorites = prefs.getStringSet("FavoriteLocations", new HashSet<>());
         Log.d("Test Favorite", "Favorite: " + favorites);
@@ -235,6 +210,76 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+        ImageView ivShare = findViewById(R.id.IdIvShare);
+        ivShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (temperatureTV.getText() != null && conditionTv.getText() != null) {
+                    // Lấy thông tin từ các TextView
+                    String cityName = cityNameTV.getText().toString();
+                    String temperature = temperatureTV.getText().toString();
+                    String condition = conditionTv.getText().toString();
+
+                    String dataToShare = "City: " + cityName + "\n"
+                            + "Temperature: " + temperature + "\n"
+                            + "Condition: " + condition;
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, dataToShare);
+                    startActivity(Intent.createChooser(shareIntent, "Chia sẻ qua"));
+                } else {
+                    Toast.makeText(getApplicationContext(), "Không thể chia sẻ do thiếu thông tin", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem item) {
+                        // Handle navigation view item clicks here.
+                        int id = item.getItemId();
+
+                        if (id == R.id.nav_favorites) {
+                            Intent intent = new Intent(MainActivity.this, FavoriteWeatherActivity.class);
+                            startActivity(intent);
+                        } else if (id == R.id.nav_share) {
+                            if (temperatureTV.getText() != null && conditionTv.getText() != null) {
+                                // Lấy thông tin từ các TextView
+                                String cityName = cityNameTV.getText().toString();
+                                String temperature = temperatureTV.getText().toString();
+                                String condition = conditionTv.getText().toString();
+
+                                String dataToShare = "City: " + cityName + "\n"
+                                        + "Temperature: " + temperature + "\n"
+                                        + "Condition: " + condition;
+                                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                                shareIntent.setType("text/plain");
+                                shareIntent.putExtra(Intent.EXTRA_TEXT, dataToShare);
+                                startActivity(Intent.createChooser(shareIntent, "Chia sẻ qua"));
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Không thể chia sẻ do thiếu thông tin", Toast.LENGTH_SHORT).show();
+                            }
+                        } else if (id == R.id.lang_english) {
+                            setLocal(MainActivity.this,"en");
+                            finish();
+                            startActivity(getIntent());
+                        } else if (id == R.id.lang_hindi) {
+                            setLocal(MainActivity.this, "hi");
+                            finish();
+                            startActivity(getIntent());
+                        } else if (id == R.id.lang_vietnamese) {
+                            setLocal(MainActivity.this, "vi");
+                            finish();
+                            startActivity(getIntent());
+                        }
+                        // Add other language handling as necessary
+
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        drawer.closeDrawer(GravityCompat.START);
+                        return true;
+                    }
+                });
     }
     private void getLocationAndWeatherInfo() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -244,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
                 cityName = getCityName(location.getLongitude(), location.getLatitude());
                 getWeatherInfo(cityName);
             } else {
-                cityName = "Ranchi"; // Default city or let the user choose one
+                cityName = "Ho Chi Minh"; // Default city or let the user choose one
                 getWeatherInfo(cityName);
             }
         }
@@ -327,11 +372,19 @@ public class MainActivity extends AppCompatActivity {
                         weatherRvModelArrayList.add(new WeatherRvModel(time, temper, img, wind));
                     }
                     weatherRVAdapter.notifyDataSetChanged();
+                    Date currentDate = new Date();
+
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                    String currentDateTime = dateFormat.format(currentDate);
                     String forecastDay = forcastO.toString();
-                    String data = cityEDT.getText().toString();
+                    String data = cityName;
+                    String currentTime= currentDateTime.toString();
+                    String childTitle = data + " " + currentTime;
+                    Log.d("childTitle", data);
                     SearchData searchData = new SearchData(data,forecastDay);
 
-                    reference.child(data).setValue(searchData);
+                    reference.child(childTitle).setValue(searchData);
 
 
                 } catch (JSONException e) {
@@ -452,5 +505,13 @@ private void refreshFavoritesAndUI() {
         super.onResume();
         refreshFavoritesAndUI();
     }
-
+    @Override
+    public void onBackPressed() {
+        // Close the drawer if it's open when the back button is pressed
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 }

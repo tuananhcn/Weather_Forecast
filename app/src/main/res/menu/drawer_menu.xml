@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_favorites"
+        android:icon="@drawable/favorite_icon"
+        android:title="@string/favorite_btn" />
+    <!-- Add more items here -->
+    <item
+        android:id="@+id/nav_share"
+        android:icon="@drawable/ic_share"
+        android:title="Share" />
+    <item android:id="@+id/nav_language"
+        android:title="Language">
+        <menu>
+            <!-- Sub-items for language selection here, as an example -->
+            <item
+                android:id="@+id/lang_english"
+                android:title="English" />
+            <item
+                android:id="@+id/lang_hindi"
+                android:title="Hindi" />
+            <item
+                android:id="@+id/lang_vietnamese"
+                android:title="Vietnamese" />
+            <!-- Add other languages here -->
+        </menu>
+    </item>
+
+</menu>

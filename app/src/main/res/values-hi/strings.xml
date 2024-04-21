@@ -8,4 +8,6 @@
     <string name="temp">23</string>
     <string name="condition">मौसम की स्थिति</string>
     <string name="favorite_btn">पसंदीदा</string>
+    <string name="navigation_drawer_open">Open</string>
+    <string name="navigation_drawer_close">Close</string>
 </resources>
