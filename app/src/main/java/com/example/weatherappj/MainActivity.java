@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView favoriteIV;
     private Set<String> favorites;
     private SharedPreferences prefs;
-    public static final String[] languages ={"Select Language","English","Vietnamese","Hindi"};
+    private String lang;
     ActivityMainBinding binding;
     String searchText;
     FirebaseDatabase db;
@@ -250,17 +250,18 @@ public class MainActivity extends AppCompatActivity {
                         } else if (id == R.id.lang_vietnamese) {
                             setLocal(MainActivity.this, "vi");
                             finish();
+                            lang = "vietnam";
                             startActivity(getIntent());
                         } else if (id == R.id.nav_chart) {
                             startActivity(ChartIntent);
                         }
                         // Add other language handling as necessary
-
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                         drawer.closeDrawer(GravityCompat.START);
                         return true;
                     }
                 });
+
     }
     private void getLocationAndWeatherInfo() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)

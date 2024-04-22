@@ -9,8 +9,8 @@
     <string name="temp">23</string>
     <string name="condition">Điều kiện thời tiết</string>
     <string name="favorite_btn">Ưa thích</string>
-    <string name="navigation_drawer_open">Open</string>
-    <string name="navigation_drawer_close">Close</string>
+    <string name="navigation_drawer_open">Mở</string>
+    <string name="navigation_drawer_close">Đóng</string>
     <string name="English">Tiếng Anh</string>
     <string name="language">Ngôn ngữ</string>
     <string name="Vietnamese">Tiếng Việt</string>
